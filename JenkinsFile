@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Start') {
+            steps {
+                echo 'Build is starting'
+            }
+        }
+        stage('Clone github repository') {
+            steps {
+                git url: 'https://github.com/amwau/gallery.git', branch: 'master'
+            }
+        }
+        stage('Get latest commit') {
+            steps {
+                sh '''
+                   export COMMIT=$(git log --oneline | awk '{print $1}' | head -n 1)
+                   echo $COMMIT
+                   '''
+            }
+        }
+        stage('Install dependencies') {
+            steps {
+                sh '''
+                   
+                   npm install
+                   '''
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'npm test'
+                
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'curl -X POST https://api.render.com/deploy/srv-cg329bd269vfaijd56b0?key=-k-XnDpASRs'
+                
+            }
+        }
+        stage('End') {
+            steps {
+                echo 'Build is finished'
+            }
+        }
+             
+    }
+}
